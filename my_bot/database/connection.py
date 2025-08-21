@@ -1,3 +1,72 @@
+"""
+🗄️ CONEXIÓN A BASE DE DATOS - CONFIGURACIÓN SQLALCHEMY
+======================================================
+
+Este módulo configura la conexión a PostgreSQL con pooling optimizado,
+gestión de sesiones y configuraciones de rendimiento para la aplicación.
+
+Autor: Sistema de Conexión BD
+Fecha: 2025-08-21
+Versión: 1.0
+
+🎯 PROPÓSITO:
+- Configurar engine SQLAlchemy con pooling optimizado
+- Gestionar sesiones de base de datos de forma eficiente
+- Proporcionar base declarativa para modelos ORM
+- Optimizar rendimiento de conexiones concurrentes
+
+🏗️ CONFIGURACIÓN DEL POOL:
+- Pool permanente: 10 conexiones activas
+- Overflow: 20 conexiones adicionales bajo demanda
+- Total máximo: 30 conexiones concurrentes
+- Pre-ping: Verificación automática de conexiones
+- Recycle: Renovación cada hora (3600s)
+
+⚡ OPTIMIZACIONES:
+- QueuePool para alta concurrencia
+- Timeouts configurados para evitar colgadas
+- Pool recycle para conexiones frescas
+- Pre-ping para detectar conexiones muertas
+
+🔧 CARACTERÍSTICAS:
+- Compatibilidad PostgreSQL y SQLite
+- Configuración adaptativa según DB type
+- Logging configurable para debugging
+- Dependency injection para FastAPI
+
+📊 GESTIÓN DE SESIONES:
+- SessionLocal: Factory de sesiones por request
+- autocommit=False: Control manual de transacciones
+- autoflush=False: Optimización de performance
+- Cierre automático en dependency
+
+🛡️ ROBUSTEZ:
+- Timeouts de conexión configurados
+- Pool overflow para picos de tráfico
+- Manejo de conexiones perdidas
+- Logging de errores de conexión
+
+📝 USO CON FASTAPI:
+    from database.connection import get_db
+    
+    @app.post("/endpoint")
+    def endpoint(db: Session = Depends(get_db)):
+        # usar sesión db aquí
+        pass
+
+🗂️ MODELOS ORM:
+    from database.connection import Base
+    
+    class MiModelo(Base):
+        __tablename__ = "mi_tabla"
+        # campos aquí
+
+💾 CONFIGURACIÓN REQUERIDA:
+- DATABASE_URL en variables de entorno
+- PostgreSQL con driver psycopg2 recomendado
+- SQLite soportado para desarrollo/testing
+"""
+
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker, declarative_base
 from sqlalchemy.pool import QueuePool

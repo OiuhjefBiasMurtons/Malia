@@ -1,3 +1,70 @@
+"""
+🚀 APLICACIÓN PRINCIPAL - SERVIDOR FASTAPI
+==========================================
+
+Este es el punto de entrada principal del bot de WhatsApp para pedidos de pavé.
+Configura el servidor FastAPI con todos los middlewares, routers y servicios.
+
+Autor: Sistema Principal WhatsApp Bot
+Fecha: 2025-08-21
+Versión: 1.0
+
+🎯 PROPÓSITO:
+- Inicializar servidor web FastAPI
+- Configurar middlewares de seguridad y CORS
+- Gestionar conexiones a servicios externos (Redis)
+- Servir archivos estáticos y documentación API
+- Proporcionar endpoints de salud y monitoreo
+
+🏗️ ARQUITECTURA:
+- FastAPI como framework web principal
+- Rate limiting para proteger endpoints
+- CORS configurado según ambiente (dev/prod)
+- Gestión de ciclo de vida para recursos
+- Routing modular por funcionalidad
+
+🔌 SERVICIOS INTEGRADOS:
+- Redis para caché de sesiones
+- PostgreSQL vía SQLAlchemy
+- Twilio para WhatsApp
+- OpenAI para IA conversacional
+
+🛡️ SEGURIDAD:
+- Rate limiting por IP
+- CORS restringido en producción
+- Validación de webhooks Twilio
+- Logs de seguridad
+
+📊 ENDPOINTS PRINCIPALES:
+- /webhook/whatsapp: Recibe mensajes de WhatsApp
+- /health: Monitoreo de estado del servicio
+- /docs: Documentación automática de API
+- /static: Archivos estáticos (imágenes de menú)
+
+🔄 CICLO DE VIDA:
+1. Startup: Conecta a Redis y servicios
+2. Runtime: Procesa requests de WhatsApp
+3. Shutdown: Cierra conexiones limpiamente
+
+⚙️ CONFIGURACIÓN:
+- Ambiente determinado por settings.DEBUG
+- CORS permisivo en desarrollo
+- Rate limits configurables
+- Logging adaptativo según ambiente
+
+📱 INTEGRACIÓN WHATSAPP:
+- Webhook principal en /webhook/whatsapp
+- Validación de firmas Twilio
+- Procesamiento asíncrono de mensajes
+- Respuestas automáticas del bot
+
+🚨 MONITOREO:
+- Health checks en /health
+- Métricas de rate limiting
+- Logs estructurados
+- Estado de servicios externos
+"""
+
 from fastapi import FastAPI, HTTPException, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
@@ -10,7 +77,7 @@ from app.services.cache_service import cache_service
 from contextlib import asynccontextmanager
 
 @asynccontextmanager
-async def lifespan(app: FastAPI):
+async def lifespan(app: FastAPI):  #PARA USAR REDIS, AUNQUE ACTUALMENTE NO LO USO
     # Conectar a Redis al iniciar la aplicación
     await cache_service.connect()
     yield

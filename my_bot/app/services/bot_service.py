@@ -1,3 +1,52 @@
+"""
+🤖 BOT SERVICE - CEREBRO DEL ASISTENTE IA
+========================================
+
+Este módulo es el núcleo de inteligencia artificial que convierte mensajes 
+de WhatsApp en respuestas útiles usando OpenAI GPT.
+
+Autor: Sistema de Chat Bot WhatsApp
+Fecha: 2025-08-21
+Versión: 2.0
+
+🎯 PROPÓSITO:
+- Procesar mensajes de usuarios de WhatsApp
+- Generar respuestas inteligentes usando OpenAI
+- Manejar diferentes tipos de respuesta (texto, imágenes, combinado)
+- Proporcionar fallbacks robustos ante errores
+
+🔄 FLUJO PRINCIPAL:
+1. Usuario envía mensaje por WhatsApp
+2. Router llama a BotService.process_message()
+3. BotService construye prompts para OpenAI
+4. OpenAI devuelve respuesta en formato JSON estructurado
+5. BotService valida y normaliza la respuesta
+6. Router envía respuesta al usuario
+
+📊 TIPOS DE RESPUESTA SOPORTADOS:
+- TEXT: Solo mensaje de texto
+- IMAGES: Solo imágenes con captions
+- COMBINED: Texto + imágenes juntos
+
+⚡ CARACTERÍSTICAS CLAVE:
+- Reintentos automáticos con backoff exponencial
+- Timeouts para evitar colgadas
+- Validación estricta de URLs de imágenes
+- Fallbacks elegantes ante errores
+- Formato JSON estructurado para consistencia
+
+🛡️ ROBUSTEZ:
+- No inventa URLs de imágenes falsas
+- Degrada graciosamente ante problemas de red
+- Limita respuestas a formatos válidos
+- Maneja errores de OpenAI (rate limits, timeouts)
+
+📝 EJEMPLO DE USO:
+    bot = BotService(db_session)
+    reply = await bot.process_message("+1234567890", "Hola, quiero pizza")
+    # reply = {"type": "text", "text_message": "¡Hola! ¿Qué pizza te interesa?"}
+"""
+
 from sqlalchemy.orm import Session
 import os
 import json

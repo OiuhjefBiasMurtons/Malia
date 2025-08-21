@@ -1,3 +1,61 @@
+"""
+⚙️ CONFIGURACIÓN GLOBAL DEL SISTEMA
+===================================
+
+Este módulo centraliza todas las configuraciones del sistema, cargando variables
+de entorno y proporcionando valores por defecto seguros para desarrollo.
+
+Autor: Sistema de Configuración Central
+Fecha: 2025-08-21
+Versión: 1.0
+
+🎯 PROPÓSITO:
+- Centralizar configuración de toda la aplicación
+- Cargar variables de entorno desde archivo .env
+- Proporcionar defaults seguros para desarrollo
+- Organizar configuraciones por categorías
+
+🏗️ CATEGORÍAS DE CONFIGURACIÓN:
+
+📊 BASE DE DATOS:
+- DATABASE_URL: PostgreSQL connection string
+- Configuración para SQLAlchemy
+
+🔗 REDIS (Caché):
+- REDIS_URL: Conexión a Redis para caché de sesiones
+- REDIS_ENABLED: Flag para habilitar/deshabilitar Redis
+
+📱 TWILIO (WhatsApp):
+- Account SID, Auth Token
+- Números para SMS y WhatsApp Business
+- Validación de webhooks
+
+🤖 OPENAI:
+- API Key para GPT
+- Modelo predeterminado (gpt-4o-mini)
+
+🛠️ APLICACIÓN:
+- SECRET_KEY: Para JWT y seguridad
+- DEBUG: Modo desarrollo/producción
+- Validación de webhooks
+
+🌐 DESARROLLO:
+- NGROK_URL: Para túneles de desarrollo
+- Rutas de archivos estáticos
+
+📊 MONITOREO:
+- SENTRY_DSN: Para logging en producción
+
+🔒 SEGURIDAD:
+- Carga desde variables de entorno
+- Valores por defecto NO incluyen credenciales reales
+- Separación entre desarrollo y producción
+
+📝 USO:
+    from config.settings import settings
+    print(settings.OPENAI_MODEL)  # "gpt-4o-mini"
+"""
+
 import os
 from dotenv import load_dotenv
 

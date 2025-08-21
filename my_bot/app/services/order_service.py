@@ -1,5 +1,72 @@
 """
-Servicio de órdenes - Funciones básicas para function calling del bot
+📦 ORDER SERVICE - GESTOR DE PEDIDOS Y SESIONES
+===============================================
+
+Este módulo es el corazón del sistema de pedidos, manejando todo el ciclo de vida
+desde la consulta del menú hasta la confirmación de pedidos de pavé.
+
+Autor: Sistema de Gestión de Pedidos WhatsApp
+Fecha: 2025-08-21
+Versión: 2.0
+
+🎯 PROPÓSITO PRINCIPAL:
+- Gestionar el menú de productos (pavés)
+- Crear, actualizar, cancelar y consultar pedidos
+- Manejar sesiones de usuario y fases de conversación
+- Validar datos de entrada y mantener consistencia
+
+🏗️ ARQUITECTURA MODERNA v2.0:
+- Decoradores de transacciones (@db_transaction, @read_only)
+- Eliminación de código duplicado try/except
+- Manejo automático de commit/rollback
+- Validación robusta de datos
+- Respuestas estandarizadas
+
+🔄 FLUJO TÍPICO DE PEDIDO:
+1. Usuario consulta menú → get_menu()
+2. Bot crea/actualiza sesión → update_session_phase()
+3. Usuario especifica productos → create_order()
+4. Sistema valida items y calcula total
+5. Pedido se guarda en estado PENDIENTE
+6. Usuario puede consultar estado → get_order_status()
+
+📊 FUNCIONES PRINCIPALES:
+
+🔍 CONSULTAS (decoradas con @read_only):
+- get_menu(): Obtiene productos disponibles
+- get_user_session(): Info de sesión actual
+- get_order_status(): Estado de pedidos
+
+✏️ MODIFICACIONES (decoradas con @db_transaction):
+- create_user(): Nuevo cliente y sesión
+- create_order(): Pedido completo con validaciones
+- update_order(): Modificar pedido pendiente
+- cancel_order(): Cancelar pedido
+
+🛡️ VALIDACIONES AUTOMÁTICAS:
+- Items válidos vs productos disponibles
+- Cantidades positivas
+- Métodos de pago reconocidos
+- Estados de pedido permitidos
+- Límites de items por pedido (max 50)
+
+💰 CÁLCULOS MONETARIOS:
+- Redondeo preciso a 2 decimales
+- Subtotales por item
+- Total general del pedido
+- Manejo de tipos Decimal para precisión
+
+📱 INTEGRACIÓN CON WHATSAPP:
+- Identificación por número de teléfono
+- Sesiones persistentes entre conversaciones
+- Fases de conversación (greeting, ordering, etc.)
+- Borradores de pedido temporal
+
+⚡ OPTIMIZACIONES:
+- Queries batch para evitar N+1
+- Validación antes de procesamiento
+- Manejo eficiente de transacciones
+- Cacheo de productos en memoria durante validación
 
 CHANGELOG v2.0 (2025-08-20):
 ✅ Agregados decoradores de transacciones para código más limpio

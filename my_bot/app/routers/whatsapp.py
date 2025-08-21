@@ -1,3 +1,71 @@
+"""
+🌐 ROUTER WHATSAPP - PUNTO DE ENTRADA DE MENSAJES
+=================================================
+
+Este módulo maneja todos los webhooks de WhatsApp que llegan desde Twilio,
+procesando mensajes entrantes y coordinando respuestas del bot.
+
+Autor: Sistema de Routing WhatsApp
+Fecha: 2025-08-21
+Versión: 1.0
+
+🎯 PROPÓSITO:
+- Recibir webhooks de mensajes de WhatsApp via Twilio
+- Validar firmas de seguridad de Twilio
+- Procesar mensajes de forma asíncrona
+- Coordinar respuestas del bot con el usuario
+- Manejar rate limiting y throttling
+
+🔄 FLUJO DE PROCESAMIENTO:
+1. Webhook llega desde Twilio
+2. Validación de firma de seguridad
+3. Normalización de datos del mensaje
+4. Throttling y deduplicación
+5. Procesamiento por BotService
+6. Respuesta via WhatsAppService
+7. Logging y métricas
+
+🛡️ SEGURIDAD:
+- Validación obligatoria de firmas Twilio
+- Rate limiting por IP y número de teléfono
+- Deduplicación de mensajes duplicados
+- Normalización de inputs para prevenir inyecciones
+
+📊 ENDPOINTS:
+- POST /webhook/whatsapp: Webhook principal de mensajes
+- Soporte para form-data y JSON
+- Rate limiting: 10 req/min por IP
+
+⚡ CARACTERÍSTICAS:
+- Procesamiento asíncrono en background
+- Reintentos automáticos con backoff
+- Throttling inteligente por usuario
+- Logging estructurado para debugging
+
+🔧 VALIDACIONES:
+- Formato de números de teléfono
+- Longitud de mensajes (max 2000 chars)
+- Firmas HMAC de Twilio
+- Rate limits configurables
+
+📱 FORMATOS SOPORTADOS:
+- Números WhatsApp: +1234567890 o whatsapp:+1234567890
+- Mensajes de texto simples
+- Metadatos de Twilio (MessageSid, etc.)
+
+🚨 MANEJO DE ERRORES:
+- Responses HTTP apropiados
+- Logging de errores para monitoreo
+- Fallbacks ante fallos de servicios
+- Reintentos automáticos para operaciones críticas
+
+📝 INTEGRACIÓN:
+- BotService: Para generar respuestas IA
+- WhatsAppService: Para enviar respuestas
+- ThrottleService: Para control de flujo
+- Database: Para persistir conversaciones
+"""
+
 from fastapi import APIRouter, Request, HTTPException, Form, BackgroundTasks, Body
 from fastapi.responses import JSONResponse
 from pydantic import BaseModel, Field, field_validator

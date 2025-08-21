@@ -1,3 +1,86 @@
+"""
+📦 MODELO DE PEDIDOS - ESTRUCTURA DE ÓRDENES
+============================================
+
+Este módulo define la estructura de datos para pedidos de pavé, incluyendo
+estados, métodos de pago, detalles de productos y relaciones con clientes.
+
+Autor: Sistema de Modelo de Datos
+Fecha: 2025-08-21
+Versión: 1.0
+
+🎯 PROPÓSITO:
+- Definir estructura de pedidos en base de datos
+- Gestionar estados del ciclo de vida del pedido
+- Manejar métodos de pago soportados
+- Relacionar pedidos con clientes y productos
+- Mantener histórico de precios y productos
+
+📊 ESTRUCTURA PRINCIPAL:
+
+🛒 TABLA PEDIDOS:
+- ID único del pedido
+- Referencia a cliente
+- Estado actual (pendiente → entregado)
+- Método de pago elegido
+- Total calculado con precisión decimal
+- Dirección de entrega
+- Notas adicionales
+- Timestamps de pedido y entrega
+
+🔍 TABLA DETALLE_PEDIDOS:
+- Items individuales del pedido
+- Cantidad de cada producto
+- Precio unitario (snapshot histórico)
+- Nombre y tamaño (snapshot para auditoría)
+- Subtotal calculado
+
+🏷️ ENUMS DEFINIDOS:
+
+💳 MÉTODOS DE PAGO:
+- TARJETA: Pagos con tarjeta
+- TRANSFERENCIA_BANCARIA: Transferencias/Nequi/etc
+- EFECTIVO: Pago contra entrega
+
+📋 ESTADOS DE PEDIDO:
+- PENDIENTE: Recién creado, esperando confirmación
+- CONFIRMADO: Aceptado por el negocio
+- PREPARANDO: En cocina
+- ENVIADO: En camino al cliente
+- ENTREGADO: Completado exitosamente
+- CANCELADO: Cancelado por cualquier motivo
+
+🔗 RELACIONES:
+- Pedido → Cliente (many-to-one)
+- Pedido → DetallePedido (one-to-many, cascade delete)
+- DetallePedido → Pave (many-to-one, snapshot data)
+
+⚡ OPTIMIZACIONES:
+- Índices compuestos para consultas frecuentes
+- Lazy loading selectivo según uso
+- Constraints de integridad a nivel DB
+
+🛡️ VALIDACIONES:
+- Total y precios no negativos
+- Cantidades positivas
+- Integridad referencial con restricciones
+- Timestamps automáticos
+
+💾 SNAPSHOTS HISTÓRICOS:
+- Precios al momento de compra
+- Nombres y tamaños de productos
+- Preserva datos aunque productos cambien
+
+📝 EJEMPLO DE USO:
+    pedido = Pedido(
+        cliente_id=1,
+        estado=EstadoPedido.PENDIENTE,
+        medio_pago=MedioPago.EFECTIVO,
+        total=Decimal('15000.00'),
+        direccion_entrega="Calle 123 #45-67"
+    )
+"""
+
 from os import name
 from sqlalchemy import Column, Integer, String, Float, DateTime, Boolean, ForeignKey, Text, Numeric
 from sqlalchemy import Enum as SQLEnum

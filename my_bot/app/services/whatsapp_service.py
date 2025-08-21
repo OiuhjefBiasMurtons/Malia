@@ -1,3 +1,67 @@
+"""
+📱 WHATSAPP SERVICE - PUENTE CON TWILIO
+======================================
+
+Este módulo maneja toda la comunicación con WhatsApp a través de la API de Twilio,
+incluyendo envío de mensajes, imágenes y validación de webhooks de seguridad.
+
+Autor: Sistema de Comunicación WhatsApp
+Fecha: 2025-08-21
+Versión: 1.5
+
+🎯 PROPÓSITO PRINCIPAL:
+- Enviar mensajes de texto a WhatsApp
+- Enviar imágenes con captions
+- Validar firmas de webhooks de Twilio (seguridad)
+- Formatear números de teléfono para WhatsApp
+
+🔐 SEGURIDAD:
+- Validación de firmas HMAC para webhooks
+- Soporte para SHA1 y SHA256
+- Protección contra ataques de timing
+- Validación tanto para form-data como JSON
+
+📤 TIPOS DE MENSAJES SOPORTADOS:
+- Texto simple
+- Imágenes con caption opcional
+- Formato automático de números WhatsApp
+
+🔄 FLUJO DE COMUNICACIÓN:
+1. Bot genera respuesta (BotService)
+2. Router llama a WhatsAppService
+3. Twilio API envía mensaje al usuario
+4. Webhook recibe respuesta/confirmación
+5. Validación de firma de seguridad
+
+⚡ CARACTERÍSTICAS CLAVE:
+- Cliente Twilio singleton para eficiencia
+- Operaciones asíncronas con anyio
+- Manejo automático de prefijo "whatsapp:"
+- Logging detallado para debugging
+- Validación robusta de webhooks
+
+🛡️ VALIDACIÓN DE WEBHOOKS:
+- validate_webhook(): Para form-data (application/x-www-form-urlencoded)
+- validate_webhook_json(): Para JSON (application/json)
+- Algoritmos: SHA1 (default) y SHA256
+- Comparación segura con timing attack protection
+
+📱 FORMATO DE NÚMEROS:
+- Entrada: "+1234567890" o "1234567890"
+- Salida: "whatsapp:+1234567890"
+- Manejo automático de prefijos
+
+🔧 CONFIGURACIÓN REQUERIDA:
+- TWILIO_ACCOUNT_SID: ID de cuenta Twilio
+- TWILIO_AUTH_TOKEN: Token de autenticación
+- TWILIO_WHATSAPP_NUMBER: Número WhatsApp de la empresa
+
+📝 EJEMPLO DE USO:
+    service = WhatsAppService()
+    await service.send_message("+1234567890", "¡Hola!")
+    await service.send_image("+1234567890", "https://...", "Menú del día")
+"""
+
 from twilio.rest import Client
 from twilio.request_validator import RequestValidator
 from config.settings import settings
