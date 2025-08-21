@@ -1,0 +1,39 @@
+fastapi==0.116.1
+uvicorn==0.35.0
+pydantic==2.11.6
+sqlalchemy==2.0.42
+psycopg2-binary>=2.9.9
+alembic>=1.16.4
+twilio>=9.6.5
+python-dotenv>=1.0.0
+python-multipart>=0.0.6
+pillow>=11.2.0
+requests>=2.31.0
+aiofiles>=23.2.1
+asyncpg>=0.29.0
+jinja2>=3.1.2
+
+# Redis para caché (versiones compatibles con Python 3.12)
+redis>=6.2.0
+
+# OpenAI
+openai>=1.97.2
+
+# Testing
+pytest>=7.4.3
+pytest-asyncio>=0.21.1
+pytest-mock>=3.12.0
+httpx>=0.25.2
+
+# Security & Rate Limiting
+slowapi>=0.1.9
+python-jose[cryptography]>=3.3.0
+
+# Logging & Monitoring
+structlog>=23.2.0
+sentry-sdk[fastapi]>=1.38.0
+
+# Development
+black>=23.11.0
+flake8>=6.1.0
+mypy>=1.7.0

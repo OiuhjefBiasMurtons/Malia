@@ -1,0 +1,9 @@
+1. Poblar base con bebidas
+
+Verificar que el Redis este en funcionamiento
+
+FUTURO:
+- Migrar idempotencia a Redis (clave dup:{MessageSid} con TTL).
+- Rate limit por número con Redis (incr por ventana).
+- Añadir send_image y respuestas combinadas.
+- Esquemas Pydantic en la entrada si luego expones /whatsapp JSON.
