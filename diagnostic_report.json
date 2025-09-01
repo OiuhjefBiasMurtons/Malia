@@ -1,0 +1,209 @@
+{
+  "timestamp": "2025-08-23T11:47:28.598218",
+  "summary": {
+    "successes": 34,
+    "warnings": 0,
+    "issues": 4
+  },
+  "details": {
+    "successes": [
+      {
+        "category": "ENV",
+        "description": "Archivo .env encontrado",
+        "timestamp": "2025-08-23T11:47:26.941213"
+      },
+      {
+        "category": "SETTINGS",
+        "description": "settings.DATABASE_URL cargado correctamente",
+        "timestamp": "2025-08-23T11:47:26.958116"
+      },
+      {
+        "category": "SETTINGS",
+        "description": "settings.OPENAI_API_KEY cargado correctamente",
+        "timestamp": "2025-08-23T11:47:26.958155"
+      },
+      {
+        "category": "SETTINGS",
+        "description": "settings.TWILIO_ACCOUNT_SID cargado correctamente",
+        "timestamp": "2025-08-23T11:47:26.958170"
+      },
+      {
+        "category": "DB",
+        "description": "Sesi\u00f3n de DB creada exitosamente",
+        "timestamp": "2025-08-23T11:47:27.130475"
+      },
+      {
+        "category": "DB",
+        "description": "Query de prueba ejecutada",
+        "timestamp": "2025-08-23T11:47:27.205647"
+      },
+      {
+        "category": "DB",
+        "description": "Tabla 'clientes' existe",
+        "timestamp": "2025-08-23T11:47:27.221357"
+      },
+      {
+        "category": "DB",
+        "description": "Tabla 'paves' existe",
+        "timestamp": "2025-08-23T11:47:27.221399"
+      },
+      {
+        "category": "DB",
+        "description": "Tabla 'pedidos' existe",
+        "timestamp": "2025-08-23T11:47:27.221404"
+      },
+      {
+        "category": "DB",
+        "description": "Tabla 'user_sessions' existe",
+        "timestamp": "2025-08-23T11:47:27.221417"
+      },
+      {
+        "category": "DB",
+        "description": "Tabla 'rate_limits' existe",
+        "timestamp": "2025-08-23T11:47:27.221431"
+      },
+      {
+        "category": "MODELS",
+        "description": "Modelo Cliente importado correctamente",
+        "timestamp": "2025-08-23T11:47:27.234439"
+      },
+      {
+        "category": "MODELS",
+        "description": "Cliente.__tablename__ = clientes",
+        "timestamp": "2025-08-23T11:47:27.234483"
+      },
+      {
+        "category": "MODELS",
+        "description": "Modelo Pave importado correctamente",
+        "timestamp": "2025-08-23T11:47:27.234504"
+      },
+      {
+        "category": "MODELS",
+        "description": "Pave.__tablename__ = paves",
+        "timestamp": "2025-08-23T11:47:27.234518"
+      },
+      {
+        "category": "MODELS",
+        "description": "Modelo Pedido importado correctamente",
+        "timestamp": "2025-08-23T11:47:27.234534"
+      },
+      {
+        "category": "MODELS",
+        "description": "Pedido.__tablename__ = pedidos",
+        "timestamp": "2025-08-23T11:47:27.234539"
+      },
+      {
+        "category": "MODELS",
+        "description": "Modelo UserSession importado correctamente",
+        "timestamp": "2025-08-23T11:47:27.234552"
+      },
+      {
+        "category": "MODELS",
+        "description": "UserSession.__tablename__ = user_sessions",
+        "timestamp": "2025-08-23T11:47:27.234565"
+      },
+      {
+        "category": "MODELS",
+        "description": "Modelo RateLimit importado correctamente",
+        "timestamp": "2025-08-23T11:47:27.234580"
+      },
+      {
+        "category": "MODELS",
+        "description": "RateLimit.__tablename__ = rate_limits",
+        "timestamp": "2025-08-23T11:47:27.234593"
+      },
+      {
+        "category": "ORDER_SERVICE",
+        "description": "OrderService inicializado",
+        "timestamp": "2025-08-23T11:47:27.610124"
+      },
+      {
+        "category": "ORDER_SERVICE",
+        "description": "get_menu() funciona correctamente",
+        "timestamp": "2025-08-23T11:47:27.625057"
+      },
+      {
+        "category": "ORDER_SERVICE",
+        "description": "create_order par\u00e1metros: ['phone_number', 'items', 'delivery_address', 'payment_method', 'notes']",
+        "timestamp": "2025-08-23T11:47:27.625396"
+      },
+      {
+        "category": "BOT_SERVICE",
+        "description": "BotService inicializado",
+        "timestamp": "2025-08-23T11:47:27.652318"
+      },
+      {
+        "category": "BOT_SERVICE",
+        "description": "Cliente OpenAI configurado",
+        "timestamp": "2025-08-23T11:47:27.652374"
+      },
+      {
+        "category": "BOT_SERVICE",
+        "description": "_tool_defs() devuelve 3 herramientas",
+        "timestamp": "2025-08-23T11:47:27.652391"
+      },
+      {
+        "category": "BOT_SERVICE",
+        "description": "Herramienta 'get_menu' definida",
+        "timestamp": "2025-08-23T11:47:27.652412"
+      },
+      {
+        "category": "BOT_SERVICE",
+        "description": "Herramienta 'create_order' definida",
+        "timestamp": "2025-08-23T11:47:27.652426"
+      },
+      {
+        "category": "BOT_SERVICE",
+        "description": "Herramienta 'get_order_status' definida",
+        "timestamp": "2025-08-23T11:47:27.652439"
+      },
+      {
+        "category": "OPENAI",
+        "description": "Cliente AsyncOpenAI creado",
+        "timestamp": "2025-08-23T11:47:28.369458"
+      },
+      {
+        "category": "DATA",
+        "description": "Hay 8 pav\u00e9s en la base de datos",
+        "timestamp": "2025-08-23T11:47:28.589952"
+      },
+      {
+        "category": "DATA",
+        "description": "Hay 2 clientes en la base de datos",
+        "timestamp": "2025-08-23T11:47:28.592995"
+      },
+      {
+        "category": "DATA",
+        "description": "Hay 12 pedidos en la base de datos",
+        "timestamp": "2025-08-23T11:47:28.598008"
+      }
+    ],
+    "warnings": [],
+    "issues": [
+      {
+        "category": "ENV",
+        "description": "Error leyendo .env: [Errno 21] Is a directory: '/home/nomadbias/GothamCode/CampCode/Python/Whatss/Malia/.env'",
+        "solution": "Verificar permisos del archivo",
+        "timestamp": "2025-08-23T11:47:26.941250"
+      },
+      {
+        "category": "ORDER_SERVICE",
+        "description": "create_order no acepta 'phone' ni 'customer_phone'",
+        "solution": "",
+        "timestamp": "2025-08-23T11:47:27.625431"
+      },
+      {
+        "category": "BOT_SERVICE",
+        "description": "process_message devuelve mensaje de error gen\u00e9rico",
+        "solution": "Revisar logs de OpenAI y validar tools",
+        "timestamp": "2025-08-23T11:47:28.354084"
+      },
+      {
+        "category": "OPENAI",
+        "description": "Error en llamada a OpenAI: Error code: 401 - {'error': {'message': 'Incorrect API key provided: sk-proj-********************************************************************************************************************************************************YXYA. You can find your API key at https://platform.openai.com/account/api-keys.', 'type': 'invalid_request_error', 'param': None, 'code': 'invalid_api_key'}}",
+        "solution": "",
+        "timestamp": "2025-08-23T11:47:28.577975"
+      }
+    ]
+  }
+}

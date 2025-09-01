@@ -18,7 +18,20 @@ Versión: 2.0
 🏗️ ARQUITECTURA MODERNA v2.0:
 - Decoradores de transacciones (@db_transaction, @read_only)
 - Eliminación de código duplicado try/except
-- Manejo automático de commit/rollback
+- Manejo automáti        # Actualizar items si se proporcionan
+        if validated_items:
+            # Eliminar detalles existentes (SQLAlchemy 2.x style)
+            self.db.execute(delete(DetallePedido).where(DetallePedido.pedido_id == pedido.id))
+            # 🔧 Flush para detectar errores temprano antes de recomponer
+            self.db.flush()
+            
+            # Recrear detalles con nuevos items
+            total = Decimal('0')
+            for item in validated_items:
+                pave = item["pave"]
+                cantidad = item["quantity"]
+                # 🔧 Manejo optimizado de Decimal (Numeric ya es Decimal en SQLAlchemy)
+                precio_unitario = pave.price if isinstance(pave.price, Decimal) else Decimal(str(pave.price))t/rollback
 - Validación robusta de datos
 - Respuestas estandarizadas
 
@@ -204,17 +217,22 @@ class OrderService:
             # Validar quantity
             quantity = item.get("quantity", 1)
             if not isinstance(quantity, int) or quantity <= 0:
-                invalid_items.append({"index": i, "item": item, "error": "Invalid quantity"})
+                invalid_items.append({"index": i, "item": item, "error": "Invalid quantity", "code": "INVALID_QUANTITY"})
+                continue
+            
+            # 🛡️ Límite por cantidad individual (evitar pedidos absurdos)
+            if quantity > 20:
+                invalid_items.append({"index": i, "item": item, "error": "Quantity too high (max 20 per item)", "code": "QUANTITY_LIMIT_EXCEEDED"})
                 continue
                 
             # Verificar que el producto existe y está disponible (desde dict cacheado)
             pave = paves_dict.get(product_id)
             if not pave:
-                invalid_items.append({"index": i, "item": item, "error": f"Product {product_id} not found"})
+                invalid_items.append({"index": i, "item": item, "error": f"Product {product_id} not found", "code": "PRODUCT_NOT_FOUND"})
                 continue
                 
             if not pave.available:
-                invalid_items.append({"index": i, "item": item, "error": f"Product {product_id} not available"})
+                invalid_items.append({"index": i, "item": item, "error": f"Product {product_id} not available", "code": "PRODUCT_NOT_AVAILABLE"})
                 continue
                 
             valid_items.append({
@@ -470,6 +488,7 @@ class OrderService:
             return {
                 "success": False, 
                 "error": "No se encontraron items válidos",
+                "code": "NO_VALID_ITEMS",
                 "details": validation["errors"],
                 "invalid_items": validation["invalid_items"]
             }
@@ -477,7 +496,7 @@ class OrderService:
         # Buscar sesión (que puede tener o no cliente)
         session = self.db.query(UserSession).filter(UserSession.phone_number == phone_number).first()
         if not session:
-            return {"success": False, "error": "Sesión no encontrada"}
+            return {"success": False, "error": "Sesión no encontrada", "code": "SESSION_NOT_FOUND"}
         
         # Si no hay cliente asociado, crear uno básico
         if not session.cliente_id:
@@ -489,12 +508,12 @@ class OrderService:
             cliente = session.cliente
             
         if not cliente:
-            return {"success": False, "error": "Cliente no encontrado"}
+            return {"success": False, "error": "Cliente no encontrado", "code": "CLIENT_NOT_FOUND"}
         
         # Validar método de pago
         medio_pago = self._normalize_payment_method(payment_method)
         if not medio_pago:
-            return {"success": False, "error": f"Método de pago inválido: {payment_method}"}
+            return {"success": False, "error": f"Método de pago inválido: {payment_method}", "code": "INVALID_PAYMENT_METHOD"}
         
         # 🚀 Crear pedido (sin try/except - el decorador lo maneja)
         pedido = Pedido(
@@ -515,7 +534,8 @@ class OrderService:
         for item in validation["valid_items"]:
             pave = item["pave"]
             cantidad = item["quantity"]
-            precio_unitario = Decimal(str(pave.price))  # Convertir a Decimal
+            # 🔧 Manejo optimizado de Decimal (Numeric ya es Decimal en SQLAlchemy)
+            precio_unitario = pave.price if isinstance(pave.price, Decimal) else Decimal(str(pave.price))
             subtotal = self._money(precio_unitario * cantidad)  # Redondeo explícito
             
             detalle = DetallePedido(
@@ -566,6 +586,7 @@ class OrderService:
             "skipped_items": validation["invalid_items"] or []
         }
 
+    @read_only
     def get_order_status(self, phone_number: str, order_id: Optional[int] = None) -> Dict[str, Any]:
         """
         Obtiene el estado de un pedido o los últimos pedidos del usuario
@@ -577,60 +598,57 @@ class OrderService:
         Returns:
             Dict con información del/los pedido(s)
         """
-        try:
-            # Buscar sesión y cliente (consistente con otras funciones)
-            session = self.db.query(UserSession).filter(UserSession.phone_number == phone_number).first()
-            if not session or not session.cliente_id:
-                return {"success": False, "error": "Cliente no encontrado"}
+        # Buscar sesión y cliente (consistente con otras funciones)
+        session = self.db.query(UserSession).filter(UserSession.phone_number == phone_number).first()
+        if not session or not session.cliente_id:
+            return {"success": False, "error": "Cliente no encontrado", "code": "CLIENT_NOT_FOUND"}
+        
+        cliente_id = session.cliente_id
+        
+        if order_id:
+            # Buscar pedido específico
+            pedido = self.db.query(Pedido).filter(
+                and_(Pedido.id == order_id, Pedido.cliente_id == cliente_id)
+            ).first()
             
-            cliente_id = session.cliente_id
+            if not pedido:
+                return {"success": False, "error": "Pedido no encontrado", "code": "ORDER_NOT_FOUND"}
             
-            if order_id:
-                # Buscar pedido específico
-                pedido = self.db.query(Pedido).filter(
-                    and_(Pedido.id == order_id, Pedido.cliente_id == cliente_id)
-                ).first()
-                
-                if not pedido:
-                    return {"success": False, "error": "Pedido no encontrado"}
-                
-                return {
-                    "success": True,
-                    "order": {
-                        "id": pedido.id,
-                        "status": pedido.estado.value,
-                        "total": float(pedido.total),
-                        "payment_method": pedido.medio_pago.value,
-                        "delivery_address": pedido.direccion_entrega,
-                        "notes": pedido.notas,
-                        "created_at": pedido.fecha_pedido.isoformat(),
-                        "estimated_delivery": pedido.fecha_entrega.isoformat() if pedido.fecha_entrega else None
-                    }
+            return {
+                "success": True,
+                "data": {
+                    "id": pedido.id,
+                    "status": pedido.estado.value,
+                    "total": float(pedido.total),
+                    "payment_method": pedido.medio_pago.value,
+                    "delivery_address": pedido.direccion_entrega,
+                    "notes": pedido.notas,
+                    "created_at": pedido.fecha_pedido.isoformat(),
+                    "estimated_delivery": pedido.fecha_entrega.isoformat() if pedido.fecha_entrega else None
                 }
-            else:
-                # Últimos pedidos
-                pedidos = self.db.query(Pedido).filter(
-                    Pedido.cliente_id == cliente_id
-                ).order_by(Pedido.fecha_pedido.desc()).limit(5).all()
-                
-                orders = []
-                for pedido in pedidos:
-                    orders.append({
-                        "id": pedido.id,
-                        "status": pedido.estado.value,
-                        "total": float(pedido.total),
-                        "created_at": pedido.fecha_pedido.isoformat()
-                    })
-                
-                return {
-                    "success": True,
+            }
+        else:
+            # Últimos pedidos
+            pedidos = self.db.query(Pedido).filter(
+                Pedido.cliente_id == cliente_id
+            ).order_by(Pedido.fecha_pedido.desc()).limit(5).all()
+            
+            orders = []
+            for pedido in pedidos:
+                orders.append({
+                    "id": pedido.id,
+                    "status": pedido.estado.value,
+                    "total": float(pedido.total),
+                    "created_at": pedido.fecha_pedido.isoformat()
+                })
+            
+            return {
+                "success": True,
+                "data": {
                     "orders": orders,
                     "total_orders": len(orders)
                 }
-                
-        except Exception as e:
-            logger.exception(f"Error obteniendo el estado del pedido: {e}")
-            return {"success": False, "error": str(e)}
+            }
 
     @db_transaction
     def update_order(self, phone_number: str, order_id: int, 
@@ -666,17 +684,17 @@ class OrderService:
         ).first()
         
         if not pedido:
-            return {"success": False, "error": "Pedido no encontrado"}
+            return {"success": False, "error": "Pedido no encontrado", "code": "ORDER_NOT_FOUND"}
         
         if pedido.estado != EstadoPedido.PENDIENTE:
-            return {"success": False, "error": "El pedido no se puede modificar en el estado actual"}
+            return {"success": False, "error": "El pedido no se puede modificar en el estado actual", "code": "ORDER_NOT_MODIFIABLE"}
 
         # 🔥 VALIDAR TODO ANTES del procesamiento
         validated_payment_method = None
         if payment_method:
             validated_payment_method = self._normalize_payment_method(payment_method)
             if not validated_payment_method:
-                return {"success": False, "error": f"Método de pago inválido: {payment_method}"}
+                return {"success": False, "error": f"Método de pago inválido: {payment_method}", "code": "INVALID_PAYMENT_METHOD"}
 
         validated_items = None
         if items:
@@ -685,6 +703,7 @@ class OrderService:
                 return {
                     "success": False, 
                     "error": "No se encontraron items válidos",
+                    "code": "NO_VALID_ITEMS",
                     "details": validation["errors"],
                     "invalid_items": validation["invalid_items"]
                 }
@@ -754,17 +773,17 @@ class OrderService:
         # Buscar sesión y cliente
         session = self.db.query(UserSession).filter(UserSession.phone_number == phone_number).first()
         if not session or not session.cliente_id:
-            return {"success": False, "error": "Cliente no encontrado"}
+            return {"success": False, "error": "Cliente no encontrado", "code": "CLIENT_NOT_FOUND"}
 
         pedido = self.db.query(Pedido).filter(
             and_(Pedido.id == order_id, Pedido.cliente_id == session.cliente_id)
         ).first()
         
         if not pedido:
-            return {"success": False, "error": "Pedido no encontrado"}
+            return {"success": False, "error": "Pedido no encontrado", "code": "ORDER_NOT_FOUND"}
         
         if pedido.estado in [EstadoPedido.ENTREGADO, EstadoPedido.CANCELADO]:
-            return {"success": False, "error": f"No se puede cancelar el pedido en estado: {pedido.estado.value}"}
+            return {"success": False, "error": f"No se puede cancelar el pedido en estado: {pedido.estado.value}", "code": "ORDER_NOT_CANCELLABLE"}
         
         pedido.estado = EstadoPedido.CANCELADO
         
@@ -796,18 +815,18 @@ class OrderService:
         # Buscar sesión y cliente
         session = self.db.query(UserSession).filter(UserSession.phone_number == phone_number).first()
         if not session or not session.cliente_id:
-            return {"success": False, "error": "Cliente no encontrado"}
+            return {"success": False, "error": "Cliente no encontrado", "code": "CLIENT_NOT_FOUND"}
         
         pedido = self.db.query(Pedido).filter(
             and_(Pedido.id == order_id, Pedido.cliente_id == session.cliente_id)
         ).first()
         
         if not pedido:
-            return {"success": False, "error": "Pedido no encontrado"}
+            return {"success": False, "error": "Pedido no encontrado", "code": "ORDER_NOT_FOUND"}
         
         # Solo permitir eliminar pedidos pendientes
         if pedido.estado != EstadoPedido.PENDIENTE:
-            return {"success": False, "error": "Solo se pueden eliminar pedidos pendientes"}
+            return {"success": False, "error": "Solo se pueden eliminar pedidos pendientes", "code": "ORDER_NOT_DELETABLE"}
         
         self.db.delete(pedido)
         

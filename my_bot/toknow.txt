@@ -1,0 +1,34 @@
+En bot_service.py en la linea 220 esta la funcion: "def _system_prompt(self) -> str". Aqui paso mis instrucciones a GPT.
+---------------------------------------------------------------------------------------------------------------------------
+El bot responde en formato: txt, images o combined. Estos son los parametros que necesitaria pasarle:
+    bot = BotService(db)
+    query = input("¿Qué quieres preguntarle al bot? ")
+    result = await bot.process_message('+573001234567', query)
+    response_type = result.get('type')
+    if response_type == 'text':
+        print(result.get('text_message', 'Sin mensaje'))
+
+    elif response_type == 'images':
+        print(f"\n🖼️ Solo imágenes:")
+        images = result.get('images', [])
+        print(f"Total de imágenes: {len(images)}")
+        for i, img in enumerate(images, 1):
+            print(f"  {i}. {img.get('caption', 'Sin descripción')}")
+            print(f"     URL: {img.get('url', 'Sin URL')}")
+            
+    elif response_type == 'combined':
+        print(f"\n� Respuesta combinada (texto + imágenes):")
+        
+        # Parte de texto
+        if result.get('text_message'):
+            print(f"\n💬 Texto:")
+            print(result.get('text_message'))
+        
+        # Parte de imágenes
+        if result.get('images'):
+            images = result.get('images', [])
+            print(f"\n🖼️ Imágenes ({len(images)}):")
+            for i, img in enumerate(images, 1):
+                print(f"  {i}. {img.get('caption', 'Sin descripción')}")
+                print(f"     URL: {img.get('url', 'Sin URL')}")
+---------------------------------------------------------------------------------------------------------------------------

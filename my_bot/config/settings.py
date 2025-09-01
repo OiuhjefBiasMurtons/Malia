@@ -57,9 +57,15 @@ Versión: 1.0
 """
 
 import os
+from pathlib import Path
 from dotenv import load_dotenv
 
-load_dotenv() # Carga las variables de entorno desde un archivo .env
+# Buscar el archivo .env en la carpeta my_bot
+current_dir = Path(__file__).parent  # config/
+project_dir = current_dir.parent     # my_bot/
+env_file = project_dir / ".env"
+
+load_dotenv(env_file)  # Carga las variables de entorno desde el archivo .env específico
 
 class Settings:
     # Database
